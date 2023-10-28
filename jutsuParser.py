@@ -66,7 +66,7 @@ class Anime():
 					episodes.append(self.domain + episode["href"])
 		return episodes
 
-	def get_films(self) -> list:
+	def get_films(self, no_domian:bool=False) -> list:
 		# # возвращает список фильмов
 		if self.soup == None:
 			logger.log_error("no data has been received from the page, the soup object has not been created")
@@ -75,7 +75,10 @@ class Anime():
 		films = []
 		for episode in self.soup.find_all("a", class_=["b-b-title the-anime-season center", "short-btn green video the_hildi", "short-btn black video the_hildi"]):
 			if "film-" in str(episode):
-				films.append(self.domain + episode["href"])
+				if no_domian:
+					films.append(episode["href"])
+				else:
+					films.append(self.domain + episode["href"])
 		return films
 
 	def get_episodes_by_arches(self, no_domian:bool=False) -> dict:
@@ -100,10 +103,10 @@ class Anime():
 					sortedArchAndEpisodes.append(a.text)
 					archTitles.append(a.text)
 					continue
-				if not no_domian:
-					sortedArchAndEpisodes.append("https://jut.su{}".format(a["href"]))
-				else:
+				if no_domian:
 					sortedArchAndEpisodes.append(a["href"])
+				else:
+					sortedArchAndEpisodes.append(self.domain + a["href"])
 
 		namelist = sortedArchAndEpisodes
 		alphabets = set(archTitles)
