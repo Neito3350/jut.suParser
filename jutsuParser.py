@@ -26,7 +26,7 @@ class Anime():
 		logger.log_info("'Anime' api init")
 
 	def get_title(self) -> str:
-		# возвращает название аниме
+		# return anime name
 		if self.soup == None:
 			logger.log_error("no data has been received from the page, the soup object has not been created")
 			return
@@ -34,7 +34,7 @@ class Anime():
 		return self.soup.find("h1", class_="header_video allanimevideo anime_padding_for_title").get_text().replace("Смотреть", "").replace("все серии", "").strip()
 
 	def get_description(self) -> str:
-		# возвращает описание аниме
+		# return anime description
 		if self.soup == None:
 			logger.log_error("no data has been received from the page, the soup object has not been created")
 			return
@@ -52,7 +52,7 @@ class Anime():
 		return " ".join(result)
 
 	def get_episodes(self, no_domian:bool=False) -> list:
-		# возвращает список эпизодо
+		# return episodes list
 		if self.soup == None:
 			logger.log_error("no data has been received from the page, the soup object has not been created")
 			return
@@ -67,7 +67,7 @@ class Anime():
 		return episodes
 
 	def get_films(self, no_domian:bool=False) -> list:
-		# # возвращает список фильмов
+		# return movie list
 		if self.soup == None:
 			logger.log_error("no data has been received from the page, the soup object has not been created")
 			return
@@ -91,9 +91,8 @@ class Anime():
 			logger.log_info("Аниме не поделено на арки")
 			return self.get_episodes()
 
-		archAndEpisodes = self.soup.find_all(["h2", "a"], class_=["b-b-title the-anime-season center", "short-btn green video the_hildi", "short-btn black video the_hildi"])
-
 		result = {}
+		archAndEpisodes = self.soup.find_all(["h2", "a"], class_=["b-b-title the-anime-season center", "short-btn green video the_hildi", "short-btn black video the_hildi"])
 
 		archTitles = []
 		sortedArchAndEpisodes = []
