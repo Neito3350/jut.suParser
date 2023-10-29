@@ -22,7 +22,7 @@
         from jutsuParser import Anime
 
         anime = Anime("https://jut.su/onepunchman")
-        anime.get_deskription() # возвращает строку с описанием аниме
+        anime.get_description() # возвращает строку с описанием аниме
         ```
     - **ФИЛЬМЫ**
         ```python
