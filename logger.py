@@ -1,8 +1,7 @@
 from time import gmtime, strftime
 
 class Logger():
-
-    def __init__(self, no_log_file:bool=True) -> None:
+    def __init__(self, no_log_file:bool=False) -> None:
         self.__no_log_file = no_log_file
         self._LOG_INFO = "[INFO]"
         self._LOG_ERROR = "[ERROR]"

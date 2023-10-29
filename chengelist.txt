@@ -1,0 +1,36 @@
+[29.10.23]
+[RUSSIAN]
+    Добавлен метод "get_fist_episode": возвращает первую серию из аниме
+    Добавлен метод "get_last_episode": возвращает последнюю серию из аниме
+    Добавлен метод "get_arches": возвращает список арок в аниме
+
+    Добавлены проверки:
+        в методе "get_direct_link":
+            * проверка на выбранное разрешение видео: если выбранного разрешения нет, метод вернет ближайшее доступное разрешение
+            * проверка на доступность контента в данной стране: если недоступно метод вернет None
+
+        в методе "get_stream":
+            * проверка на доступность потока: если недоступно метод вернет None
+
+    Переименован метод "get_number" в "get_title_plus_serial_number"
+    Переименован метод "get_title" в "get_full_title"
+    Добавлен класс "Downloader" в файле "downloader.py": загружает файлы из потока (поток можно получить из метода "get_stream" класса Episode)
+    Исправлен и переделан выбор разрешения видео в методе "get_direct_link"
+
+[ENGLISH]
+    - Added the "get_fist_episode" method: returns the first episode from the anime
+    - Added the "get_last_episode" method: returns the last episode from the anime
+    - Added the "get_arches" method: returns a list of arches in anime
+
+    - Added checks:
+        in the "get_direct_link" method:
+            * check for the selected video resolution: if there is no selected resolution, the method will return the nearest available resolution
+            * checking for the availability of content in this country: if unavailable, the method returns None
+
+        in the "get_stream" method:
+            * checking for thread availability: if unavailable, the method returns None
+
+    - Renamed the "get_number" method to "get_title_plus_serial_number"
+    - Renamed the "get_title" method to "get_full_title"
+    - Added the "Downloader" class in the file "downloader.py ": loads files from the stream (the stream can be obtained from the "get_stream" method of the Episode class)
+    - Fixed and redone the video resolution selection in the "get_direct_link" method

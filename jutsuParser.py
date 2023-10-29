@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from logger import Logger
 
-logger = Logger()
+logger = Logger(no_log_file=True)
 
 HEADERS = {
 	"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
@@ -23,8 +23,18 @@ class Anime():
 			logger.log_error(f"when requesting for {self.url}, the site returned the status code {self.req.status_code}")
 			self.soup = None
 
-		logger.log_info("'Anime' api init")
+	def get_first_episode(self):
+		# return first episode in anime
+		return self.get_episodes()[0]
 
+	def get_last_episode(self):
+		# return last episode in anime
+		return self.get_episodes()[-1]
+
+	def get_arches(self):
+		# return arches list
+		return [i.get_text() for i in self.soup.find_all("h2", class_="b-b-title the-anime-season center")]
+	
 	def get_title(self) -> str:
 		# return anime name
 		if self.soup == None:
@@ -50,7 +60,7 @@ class Anime():
 			result.append(str(i).replace("<b>", "").replace("</b>", "").replace("</br>", "").replace("<br/>", "").strip())
 
 		return " ".join(result)
-
+	
 	def get_episodes(self, no_domian:bool=False) -> list:
 		# return episodes list
 		if self.soup == None:
@@ -65,7 +75,7 @@ class Anime():
 				else:
 					episodes.append(self.domain + episode["href"])
 		return episodes
-
+	
 	def get_films(self, no_domian:bool=False) -> list:
 		# return movie list
 		if self.soup == None:
@@ -133,14 +143,12 @@ class Episode():
 		else:
 			logger.log_error(f"when requesting for {self.url}, the site returned the status code {self.req.status_code}")
 			self.soup = None
-
-		logger.log_info("'Episode' api init")
 	
-	def get_number(self) -> str:
+	def get_title_plus_serial_number(self) -> str:
 		# returns title + season (if any) + series
 		return self.soup.find("span", attrs={"itemprop":"name"}).get_text().replace("Смотреть", "").strip()
 
-	def get_title(self) -> str:
+	def get_full_title(self) -> str:
 		# returns the series name
 		return self.soup.find("div", class_="video_plate_title").find("h2").get_text()
 
@@ -165,65 +173,26 @@ class Episode():
 		if self.soup == None:
 			logger.log_error("no data has been received from the page, the soup object has not been created")
 			return
-		
-		for src in self.soup.find_all("source"):
-			if src["res"] == resolution:
-				logger.log_info(f"receiver direct link {src['src']} with video resolution {resolution}")
-				return src["src"]
 
+		all_src = self.soup.find_all("source", attrs={"type":"video/mp4"})
+		if all_src == []:
+			logger.log_error("This video blocked in your country")
+			return
+		
+		for i in all_src:
+			if resolution in i["res"]:
+				return i["src"]
+		return all_src[-1]["src"]
+		
 	def get_stream(self, resolution:str) -> list:
 		# return stream object and content length
 		direct_link = self.get_direct_link(resolution)
-		stream = requests.get(direct_link, headers=HEADERS, stream=True)
-		contentLength = int(stream.headers.get("content-length", 0))
-		logger.log_info(f"stream status code: {stream}, content-length: {str(contentLength)}")
-		return [stream, contentLength]
-
-
-"""the loader class is problematic"""
-# stop_flag = False
-# class Downloader():
-# 	def __init__(self, title, stream, streamLength, out_dir):
-# 		self.title = title
-# 		self.stream = stream
-# 		self.streamLength = streamLength
-# 		self.out_dir = out_dir
-
-# 	def progress(self):
-# 		return tqdm(
-# 			desc=self.title,
-# 			total=self.streamLength,
-# 			unit='B', unit_scale=True, unit_divisor=1024,
-# 			dynamic_ncols=True, bar_format="{desc}{percentage:3.0f}%[{n_fmt}/{total_fmt}][{remaining}][{rate_fmt}{postfix}]")
+		if not direct_link == None:
+			stream = requests.get(direct_link, headers=HEADERS, stream=True)
+			contentLength = int(stream.headers.get("content-length", 0))
+			logger.log_info(f"stream status code: {stream}, content-length: {str(contentLength)}")
+			return [stream, contentLength]
+		else:
+			logger.log_error("The stream is unaviable")
+			return
 	
-# 	def _load(self):
-# 		if not os.path.isdir(self.out_dir):
-# 			os.makedirs(self.out_dir)
-
-# 		if not os.path.isfile("{}/{}.mp4".format(self.out_dir, self.title)):
-
-# 			with open("{}/{}.mp4".format(self.out_dir, self.title), 'wb') as file:
-# 				bar = self.progress()
-# 				for content in self.stream.iter_content(chunk_size=1024):
-# 					global stop_flag
-# 					if stop_flag:
-# 						break
-# 					size = file.write(content)
-# 					bar.update(size)
-# 			if not stop_flag:
-# 				logger.log_info("downloaded complete")
-# 		else:
-# 			logger.log_error("the file exists")
-
-# 	def start_download(self):
-# 		self.load_thread = Thread(target=self._load, name="Downloading Thread")
-# 		self.load_thread.start()
-# 		self.load_thread.join()
-# 		logger.log_info(f"start download width thread '{self.load_thread.name}': {self.title}; {self.stream}; {self.streamLength}")
-
-# 	def stop_download(self):
-# 		global stop_flag
-# 		if not stop_flag:
-# 			stop_flag = True
-# 			self.load_thread.join()
-# 			logger.log_info("stop download")
