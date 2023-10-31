@@ -1,5 +1,5 @@
 # jutsu Parser
-## Буду по возможности дорабатывать и исправлять ошибки.
+**Буду по возможности дорабатывать и исправлять ошибки.**
 ```python
 from jutsuParser import Anime, Episode
 from downloader import Downloader
