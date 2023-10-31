@@ -1,9 +1,10 @@
 # jutsu Parser
+## Буду по возможности дорабатывать и исправлять ошибки.
 ```python
 from jutsuParser import Anime, Episode
 from downloader import Downloader
 
-anime = Anime("URL")
+anime = Anime("URL TO ANIME")
 
 title = anime.get_title() # название аниме
 anime.get_description() # описание
@@ -14,7 +15,7 @@ anime.get_first_episode() # вернёт первый эпизод
 anime.get_last_episode() # вернет последний эпизод
 anime.get_episodes_by_arches() # вернет словарь: арка + принадлежащие ей эпизоды
 
-episode = Episode("URL")
+episode = Episode("URL TO EPISODE")
 
 episode.get_title_plus_serial_number() # вернет название аниме + сезон + серия "Ванпанчмен 1 сезон 1 серия"
 episode.get_full_title() # вернет реальное название серии "Ванпанчмен 1 серия: сильнейший человек"
