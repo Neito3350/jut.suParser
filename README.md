@@ -6,7 +6,7 @@ from downloader import Downloader
 
 anime = Anime("URL TO ANIME")
 
-title = anime.get_title() # название аниме
+anime.get_title() # название аниме
 anime.get_description() # описание
 anime.get_arches() # список арок
 anime.get_films() # вернет список фильмов
@@ -24,5 +24,5 @@ episode.get_early_episode() # вернет предыдущий эпизод
 episode.get_direct_link() # вернет прямую ссылку на серию
 stream, contentLength = episode.get_stream("разрешение: 360, 480, 720, 1080") # вернет список [stream, contentLength]
 
-Downloader(stream=stream, streamLength=contentLength, out_dir=".\\", title=title).download() # скачает серию
+Downloader(stream=stream, streamLength=contentLength, out_dir=".\\").download() # скачает серию
 ```
