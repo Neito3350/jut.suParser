@@ -144,11 +144,11 @@ class Episode():
 			logger.log_error(f"when requesting for {self.url}, the site returned the status code {self.req.status_code}")
 			self.soup = None
 	
-	def get_title_plus_serial_number(self) -> str:
+	def get_current_episode_name(self) -> str:
 		# returns title + season (if any) + series
 		return self.soup.find("span", attrs={"itemprop":"name"}).get_text().replace("Смотреть", "").strip()
 
-	def get_full_title(self) -> str:
+	def get_title(self) -> str:
 		# returns the series name
 		return self.soup.find("div", class_="video_plate_title").find("h2").get_text()
 
