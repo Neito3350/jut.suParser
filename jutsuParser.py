@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-from logger import Logger
+from newlogger import Logger
 
-logger = Logger(no_log_file=True)
+logger = Logger(write_to_logfile=True)
 
 HEADERS = {
 	"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
@@ -12,41 +12,45 @@ HEADERS = {
 class Anime():
 	def __init__(self, url:str):
 		"""the class implements anime parsing (episodes, movies, episodes by arches, etc.)"""
-		self.domain = "https://jut.su"
+		self._domian = "https://jut.su"
 		self.url = url
-		self.req = requests.get(self.url, headers=HEADERS)
+		self._req = requests.get(self.url, headers=HEADERS)
 
-		if self.req.status_code == 200:
-			logger.log_info(f"when requesting for {self.url}, the site returned the status code {self.req.status_code}")
-			self.soup = BeautifulSoup(self.req.text, "lxml")
+		if self._req.status_code == 200:
+			logger.info(f"when requesting for {self.url}, the site returned the status code {self._req.status_code}")
+			self.soup = BeautifulSoup(self._req.text, "lxml")
 		else:
-			logger.log_error(f"when requesting for {self.url}, the site returned the status code {self.req.status_code}")
+			logger.error(f"when requesting for {self.url}, the site returned the status code {self._req.status_code}")
 			self.soup = None
 
-	def get_first_episode(self):
+	def get_slogan(self) -> str:
+		# return slogan
+		return self.soup.find("div", class_="top_logo_slogan").get_text()
+
+	def get_first_episode(self) -> str:
 		# return first episode in anime
 		return self.get_episodes()[0]
 
-	def get_last_episode(self):
+	def get_last_episode(self) -> str:
 		# return last episode in anime
 		return self.get_episodes()[-1]
 
-	def get_arches(self):
+	def get_arches(self) -> list:
 		# return arches list
 		return [i.get_text() for i in self.soup.find_all("h2", class_="b-b-title the-anime-season center")]
 	
-	def get_title(self) -> str:
+	def get_anime_title(self) -> str:
 		# return anime name
 		if self.soup == None:
-			logger.log_error("no data has been received from the page, the soup object has not been created")
+			logger.error("no data has been received from the page, the soup object has not been created")
 			return
 		
-		return self.soup.find("h1", class_="header_video allanimevideo anime_padding_for_title").get_text().replace("Смотреть", "").replace("все серии", "").strip()
+		return self.soup.find("h1", class_="header_video allanimevideo anime_padding_for_title").get_text().replace("Смотреть", "").replace("все серии", "").replace("и сезоны", "").strip()
 
 	def get_description(self) -> str:
 		# return anime description
 		if self.soup == None:
-			logger.log_error("no data has been received from the page, the soup object has not been created")
+			logger.error("no data has been received from the page, the soup object has not been created")
 			return
 
 		result = []
@@ -64,7 +68,7 @@ class Anime():
 	def get_episodes(self, no_domian:bool=False) -> list:
 		# return episodes list
 		if self.soup == None:
-			logger.log_error("no data has been received from the page, the soup object has not been created")
+			logger.error("no data has been received from the page, the soup object has not been created")
 			return
 		
 		episodes = []
@@ -73,13 +77,13 @@ class Anime():
 				if no_domian:
 					episodes.append(episode["href"])
 				else:
-					episodes.append(self.domain + episode["href"])
+					episodes.append(self._domian + episode["href"])
 		return episodes
 	
 	def get_films(self, no_domian:bool=False) -> list:
 		# return movie list
 		if self.soup == None:
-			logger.log_error("no data has been received from the page, the soup object has not been created")
+			logger.error("no data has been received from the page, the soup object has not been created")
 			return
 		
 		films = []
@@ -88,17 +92,17 @@ class Anime():
 				if no_domian:
 					films.append(episode["href"])
 				else:
-					films.append(self.domain + episode["href"])
+					films.append(self._domian + episode["href"])
 		return films
 
 	def get_episodes_by_arches(self, no_domian:bool=False) -> dict:
 		# return episodes by arches
 		if self.soup == None:
-			logger.log_error("no data has been received from the page, the soup object has not been created")
+			logger.error("no data has been received from the page, the soup object has not been created")
 			return
 
 		if not self.soup.find("h2", class_="b-b-title the-anime-season center"):
-			logger.log_info("Аниме не поделено на арки")
+			logger.info("Аниме не поделено на арки")
 			return self.get_episodes()
 
 		result = {}
@@ -115,7 +119,7 @@ class Anime():
 				if no_domian:
 					sortedArchAndEpisodes.append(a["href"])
 				else:
-					sortedArchAndEpisodes.append(self.domain + a["href"])
+					sortedArchAndEpisodes.append(self._domian + a["href"])
 
 		namelist = sortedArchAndEpisodes
 		alphabets = set(archTitles)
@@ -134,21 +138,21 @@ class Episode():
 	def __init__(self, url:str):
 		"""the class implements parsing of episode characteristics (title, direct link, etc.)"""
 		self.url = url
-		self.req = requests.get(self.url, headers=HEADERS)
+		self._req = requests.get(self.url, headers=HEADERS)
 		self._domian = "https://jut.su"
 
-		if self.req.status_code == 200:
-			logger.log_info(f"when requesting for {self.url}, the site returned the status code {self.req.status_code}")
-			self.soup = BeautifulSoup(self.req.text, "lxml")
+		if self._req.status_code == 200:
+			logger.info(f"when requesting for {self.url}, the site returned the status code {self._req.status_code}")
+			self.soup = BeautifulSoup(self._req.text, "lxml")
 		else:
-			logger.log_error(f"when requesting for {self.url}, the site returned the status code {self.req.status_code}")
+			logger.error(f"when requesting for {self.url}, the site returned the status code {self._req.status_code}")
 			self.soup = None
-	
-	def get_current_episode_name(self) -> str:
+
+	def get_episode_number(self) -> str:
 		# returns title + season (if any) + series
 		return self.soup.find("span", attrs={"itemprop":"name"}).get_text().replace("Смотреть", "").strip()
 
-	def get_title(self) -> str:
+	def get_episode_title(self) -> str:
 		# returns the series name
 		return self.soup.find("div", class_="video_plate_title").find("h2").get_text()
 
@@ -171,12 +175,12 @@ class Episode():
 	def get_direct_link(self, resolution:str) -> str:
 		# return direct link on episode
 		if self.soup == None:
-			logger.log_error("no data has been received from the page, the soup object has not been created")
+			logger.error("no data has been received from the page, the soup object has not been created")
 			return
 
 		all_src = self.soup.find_all("source", attrs={"type":"video/mp4"})
 		if all_src == []:
-			logger.log_error("This video blocked in your country")
+			logger.error("This video blocked in your country")
 			return
 		
 		for i in all_src:
@@ -190,9 +194,9 @@ class Episode():
 		if not direct_link == None:
 			stream = requests.get(direct_link, headers=HEADERS, stream=True)
 			contentLength = int(stream.headers.get("content-length", 0))
-			logger.log_info(f"stream status code: {stream}, content-length: {str(contentLength)}")
+			logger.info(f"stream status code: {stream}, content-length: {str(contentLength)}")
 			return [stream, contentLength]
 		else:
-			logger.log_error("The stream is unaviable")
+			logger.error("The stream is unaviable")
 			return
 	
