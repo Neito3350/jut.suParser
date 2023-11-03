@@ -1,4 +1,5 @@
 import requests
+import re
 from bs4 import BeautifulSoup
 from newlogger import Logger
 
@@ -23,6 +24,24 @@ class Anime():
 			logger.setlog(f"get запрос на {self.url}, статус код {self._req.status_code}")
 			self.soup = None
 
+	def get_specs(self) -> dict:
+		# вернет жанр, год выпуска, темы, возрастной рейтинг, оригинальное название
+		if self.soup == None:
+			logger.setlog("нет данных на странице или объект супа не создан")
+			return
+		
+		result = {}
+		raw = self.soup.find("div", class_="under_video_additional the_hildi")
+
+		for i in raw.find_all("i"):
+			i.decompose()
+
+		for i in str(raw).split("<br/>"):
+			temp = re.sub("<.*?>|&.*?;|\\n|\\xa0", "", i).strip().split(":")
+			result[temp[0]] = temp[1].strip()
+
+		return result
+	
 	def get_slogan(self) -> str:
 		# возвращает слоган
 		return self.soup.find("div", class_="top_logo_slogan").get_text()
@@ -39,7 +58,7 @@ class Anime():
 		# возвращает арки
 		return [i.get_text() for i in self.soup.find_all("h2", class_="b-b-title the-anime-season center")]
 	
-	def get_anime_title(self) -> str:
+	def get_title(self) -> str:
 		# возвращает название аниме
 		if self.soup == None:
 			logger.setlog("нет данных на странице или объект супа не создан")
@@ -148,11 +167,11 @@ class Episode():
 			logger.setlog(f"get запрос на {self.url}, статус код {self._req.status_code}")
 			self.soup = None
 
-	def get_episode_number(self) -> str:
+	def get_number(self) -> str:
 		# возвращает название аниме + сезон + серия
 		return self.soup.find("span", attrs={"itemprop":"name"}).get_text().replace("Смотреть", "").strip()
 
-	def get_episode_title(self) -> str:
+	def get_title(self) -> str:
 		# возвращает название эпизода
 		return self.soup.find("div", class_="video_plate_title").find("h2").get_text()
 
