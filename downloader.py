@@ -1,12 +1,12 @@
 from tqdm import tqdm
-from logger import Logger
+from newlogger import Logger
 # from threading import Thread
 import os
 
-logger = Logger(no_log_file=True)
+logger = Logger(write_to_logfile=True)
 
 class Downloader():
-    def __init__(self,  stream, streamLength:int, out_dir:str, title:str="file"):
+    def __init__(self,  stream, streamLength:int, out_dir:str=".\\", title:str="file"):
         self.title = title
         self.stream = stream
         self.streamLength = streamLength
@@ -27,12 +27,12 @@ class Downloader():
         if not os.path.isdir(self.out_dir):
             os.makedirs(self.out_dir)
         else:
-            logger.log_error("the dir exists")
+            logger.setlog("директория существует")
 
         if not os.path.isfile("{}/{}.mp4".format(self.out_dir, self.title)):
-            logger.log_info("make out file")
+            logger.setlog("создан выходной файл")
         else:
-            logger.log_error("the file exists")
+            logger.setlog("файл существует")
 
     def download(self):
         self.__check_dir_and_file_exists()
@@ -43,5 +43,5 @@ class Downloader():
                 size = file.write(content)
                 bar.update(size)
                 if file.closed:
-                    logger.log_info("load complete")
+                    logger.setlog("загрузка завершена")
         
