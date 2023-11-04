@@ -1,5 +1,6 @@
 # jutsu Parser
 ## Использование:
+Downloader убран, будет переделан.
 ```python
 from jutsuParser import Anime, Episode
 from downloader import Downloader
@@ -24,7 +25,5 @@ episode.get_title() # реальное название серии "сильне
 episode.get_next_episode() # следующий эпизод (если есть)
 episode.get_early_episode() # предыдущий эпизод
 episode.get_direct_link() # прямая ссылка на серию
-stream, contentLength = episode.get_stream("разрешение: 360, 480, 720, 1080") # список [stream, contentLength]
-
-Downloader(stream=stream, streamLength=contentLength, out_dir=".\\").download() # скачает серию
+episode.get_stream("разрешение: 360, 480, 720, 1080") # список [stream, contentLength]
 ```
