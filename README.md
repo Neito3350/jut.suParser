@@ -2,7 +2,7 @@
 ## Использование:
 ```python
 from jutsuParser import Anime, Episode
-from downloader import Downloader
+from loader import Loader
 
 # методы класса Anime
 anime = Anime("URL TO ANIME")
@@ -25,4 +25,10 @@ episode.get_next_episode() # следующий эпизод (если есть)
 episode.get_early_episode() # предыдущий эпизод
 episode.get_direct_link() # прямая ссылка на серию
 episode.get_stream("разрешение: 360, 480, 720, 1080") # список [stream, contentLength]
+
+# использование загрузчика
+filename = episode.get_number()
+stream, contentLength = episode.get_stream("480")
+loader = Loader(stream = stream, contentLength = contentLength, filename = filename)
+loader.download()
 ```
