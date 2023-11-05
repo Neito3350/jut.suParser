@@ -1,6 +1,5 @@
 # jutsu Parser
 ## Использование:
-Downloader убран, будет переделан.
 ```python
 from jutsuParser import Anime, Episode
 from downloader import Downloader
