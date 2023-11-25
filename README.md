@@ -1,7 +1,7 @@
 # jutsu Parser
 ## Использование:
 ```python
-from jutsuParser import Anime, Episode
+from jutsuParser import Anime, Episode, Jutsu
 from loader import Loader
 
 # методы класса Anime
@@ -25,6 +25,11 @@ episode.get_next_episode() # следующий эпизод (если есть)
 episode.get_early_episode() # предыдущий эпизод
 episode.get_direct_link() # прямая ссылка на серию
 episode.get_stream("разрешение: 360, 480, 720, 1080") # список [stream, contentLength]
+
+# методы класса Jutsu
+jutsu = Jutsu()
+jutsu.get_anime_blocks(url="URL TO ANIME LIST", pages_number=1) # словарь {"название":{"link":"ссылка", "info":[сезоны, серии, фильмы]}}
+jutsu.get_all_anime(pages=5, write_to_json=True) # вернет словарь {"название":{"link":"ссылка", "info":[сезоны, серии, фильмы]}} с указанного количества страниц (при необходимости запишет в json файл)
 
 # использование загрузчика
 filename = episode.get_number()

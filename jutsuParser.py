@@ -1,23 +1,23 @@
 import requests
 import re
+import json
 from bs4 import BeautifulSoup
-from newlogger import Logger
-from config import HEADERS
+from logger import Logger
+from config import HEADERS, WRITE_LOGS_TO_FILE, POST_HEADERS
 
-logger = Logger(write_to_logfile=True)
+logger = Logger(write_to_logfile=WRITE_LOGS_TO_FILE)
 
 class Anime():
 
 	def __init__(self, url:str, no_domian:bool=False):
 		"""класс реализует парсинг аниме (эпизоды, название, слоган и т.д)"""
 		self._url = url
-		self._req = requests.get(self._url, headers=HEADERS)
 		self._no_domian = no_domian
+		self._req = requests.get(self._url, headers=HEADERS)
 
+		self._domian = "https://jut.su"
 		if self._no_domian:
 			self._domian = ""
-		else:
-			self._domian = "https://jut.su"
 
 		if not self._req.status_code == 200:
 			logger.setlog(f"запрос на {self._url}, статус код {self._req.status_code}")
@@ -45,18 +45,34 @@ class Anime():
 	
 	def get_slogan(self) -> str:
 		# возвращает слоган
+		if not self._soup:
+			logger.setlog("объект супа не создан")
+			return
+		
 		return self._soup.find("div", class_="top_logo_slogan").get_text()
 
 	def get_first_episode(self) -> str:
 		# возвращает первый эпизод в аниме
+		if not self._soup:
+			logger.setlog("объект супа не создан")
+			return
+		
 		return self.get_episodes()[0]
 
 	def get_last_episode(self) -> str:
 		# возвращает последний эпизод в аниме
+		if not self._soup:
+			logger.setlog("объект супа не создан")
+			return
+		
 		return self.get_episodes()[-1]
 
 	def get_arches(self) -> list:
 		# возвращает арки
+		if not self._soup:
+			logger.setlog("объект супа не создан")
+			return
+		
 		return [i.get_text() for i in self._soup.find_all("h2", class_="b-b-title the-anime-season center")]
 	
 	def get_title(self) -> str:
@@ -215,4 +231,64 @@ class Episode():
 		else:
 			logger.setlog("Поток недоступен")
 			return
-	
+
+
+class Jutsu:
+
+	def __init__(self):
+		pass
+
+	def get_anime_blocks(self, url:str, page_number:int) -> dict:
+		# вернет словарь аниме {"название":{"link":"ссылка", "info":[сезоны, серии, фильмы]}}
+		domain = "https://jut.su"
+		payload = {"ajax_load":"yes", "start_from_page":str(page_number), "show_search":"", "anime_of_user":""}
+		
+		page = requests.post(url, headers=POST_HEADERS, data=payload)
+		anime_blocks = BeautifulSoup(page.text, "lxml")
+
+		result = {}
+		for anime in anime_blocks.find_all("a"):
+			title = re.sub("<.*?>|&.*?;|\\n|\\xa0", "", str(anime.find("div", class_="aaname")))
+			link = anime["href"]
+
+			data = {}
+			params = []
+			params.clear()
+			for i in str(anime.find("div", class_="aailines")).strip().split("<br/>"):
+				params.append(re.sub("<.*?>|&.*?;|\\n|\\xa0", "", i.replace("\r", "").strip()))
+
+			data["link"] = domain + link
+			data["info"] = params
+
+			if not title == "None":
+				result[title] = data
+
+		return result
+
+	def get_all_anime(self, pages:int, write_to_json:bool=False) -> dict:
+		# вернет словарь: {"название":{"link":"ссылка", "info":[сезоны, серии, фильмы]}}
+		# запишет все данные в json (если нужно)
+		data = {}
+
+		try:
+			for i in range(1, pages + 1):
+				try:
+					anime_blocks = self.get_anime_blocks("https://jut.su/anime/", i)
+
+					if anime_blocks:
+						data = data | anime_blocks
+						print(f"Страница под номером {i}/{pages}: готово (Данные: {bool(anime_blocks)})")
+					else:
+						print(f"Страница под номером {i}/{pages}: ошибка (Данные: {bool(anime_blocks)})")
+
+				except:
+					print(Exception.with_traceback())
+					break
+		finally:
+			if write_to_json:
+				with open("anime.json", "w", encoding="utf-8") as file:
+					print("Готово. Данные записаны в json файл")
+					json.dump(data, file, ensure_ascii=False, indent=4)
+			print("Готово")
+
+		return data
