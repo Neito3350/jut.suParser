@@ -1,4 +1,4 @@
-# jutsu Parser
+# jut.su Parser - набор методов для парсинга аниме с сайта https://jut.su
 
 ## Пример:
 ```python
