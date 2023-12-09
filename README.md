@@ -29,7 +29,7 @@ episode.get_stream("разрешение: 360, 480, 720, 1080") # -> list: сп�
 
 # использование загрузчика
 filename = episode.get_titles()[0]
-stream, contentLength = episode.get_stream("480") -> list
+stream, contentLength = episode.get_stream("480") # -> list
 loader = Loader(stream = stream, contentLength = contentLength, filename = filename)
 loader.download()
 ```
