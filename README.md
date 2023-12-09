@@ -1,13 +1,5 @@
 # jutsu Parser
 
-## Последние изменения:
-**[09.12.23]:
-    1. Удален класс "Jutsu"
-    1. Исправлен импорт "logger" в "loader.py"
-    1. Методы "get_number" и "get_title" в классе "Episode" собраны в один: 1. 1. 1. "get_titles" - возвращает список: [название аниме + сезон + серия, название эпизода]
-    1. Метод "get_direct_link" был скрыт ("__get_direct_link")
-    1. Классы "Anime" и "Episode" разделены по файлам**
-
 ## Пример:
 ```python
 from Anime import Anime
