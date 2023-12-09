@@ -1,4 +1,4 @@
-from newlogger import Logger
+from logger import Logger
 from tqdm import tqdm
 import os
 
@@ -12,10 +12,6 @@ class Loader():
         self._filename = filename
         self._out_dir = out_dir
         self._bar_format = "{desc}: {percentage:3.0f}%[{n_fmt}/{total_fmt}][{remaining}][{rate_fmt}{postfix}]" 
-
-    def set_bar_format(self, bar_format_string:str):
-        # устанавливает формат вывода прогреса загрузки
-        self._bar_format = bar_format_string
 
     def __progress(self):
         # вернет объект класса tqdm
