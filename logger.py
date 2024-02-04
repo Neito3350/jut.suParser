@@ -8,7 +8,7 @@ class Logger():
         self.no_print = no_print
 
     def __log(self, message):
-        logstring = f"[{strftime("%H:%M:%S", gmtime())}]: {message}"
+        logstring = f"[{strftime('%H:%M:%S', gmtime())}]: {message}"
         
         if not self.no_print:
             print(logstring)

@@ -7,7 +7,7 @@ logger = Logger(write_to_logfile=WRITE_LOGS_TO_FILE)
 
 class Episode():
 
-	def __init__(self, url:str, no_domian:bool=False):
+	def __init__(self, url: str, no_domian:bool=False):
 		"""класс реализует парсинг эпизода (название, прямая ссылка, предыдущий и следующий эпизод и т.д)"""
 		self._url = url
 		self._req = requests.get(self._url, headers=HEADERS)
@@ -44,7 +44,7 @@ class Episode():
 			return
 		return self._domian + early_episode["href"]
 
-	def __get_direct_link(self, resolution:str) -> str:
+	def get_direct_link(self, resolution:str) -> str:
 		# возвращает прямую ссылку на эпизод
 		if not self._soup:
 			logger.setlog("объект супа не создан")
@@ -60,14 +60,14 @@ class Episode():
 				return i["src"]
 		return all_src[-1]["src"]
 		
-	def get_stream(self, resolution:str) -> list:
-		# возвращает поток и размер потока
-		direct_link = self.get_direct_link(resolution)
-		if not direct_link == None:
-			stream = requests.get(direct_link, headers=HEADERS, stream=True)
-			contentLength = int(stream.headers.get("content-length", 0))
-			logger.setlog(f"статус код потока: {stream}, размер контента (в байтах): {str(contentLength)}")
-			return [stream, contentLength]
-		else:
-			logger.setlog("Поток недоступен")
-			return
+	# def get_stream(self, resolution:str) -> list:
+	# 	# возвращает поток и размер потока
+	# 	direct_link = self.get_direct_link(resolution)
+	# 	if not direct_link == None:
+	# 		stream = requests.get(direct_link, headers=HEADERS, stream=True)
+	# 		contentLength = int(stream.headers.get("content-length", 0))
+	# 		logger.setlog(f"статус код потока: {stream}, размер контента (в байтах): {str(contentLength)}")
+	# 		return [stream, contentLength]
+	# 	else:
+	# 		logger.setlog("Поток недоступен")
+	# 		return
