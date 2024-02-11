@@ -30,11 +30,13 @@ episode.get_direct_link() # прямая ссылка на серию
 # episode.get_stream("разрешение: 360, 480, 720, 1080") # список [stream, contentLength]
 
 # использование асинхронного загрузчика
-filename = episode.get_titles()[0]
-direct_link = episode.get_direct_link('1080')
+filename = episode.get_titles()[0] # получаем название серии
+direct_link = episode.get_direct_link('1080') # получаем прямую ссылку на эпизод
 
-asl = AsyncLoader()
-asl.set_ext('mp4')
-asl.set_urls([(direct_link, filename)]) # тут можно указать несколько кортежей с ссылками и названиями, они будут загружаться параллельно
-asl.go()
+asl = AsyncLoader() # создаем объект класса 'AsyncLoader'
+asl.set_params(
+  urls = [(direct_link, filename)],
+  extention = '.mp4'
+) # указываем параметры (список ссылок + названий и расширение файлов)
+asl.go() # запускаем загрузку
 ```
