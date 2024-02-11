@@ -6,17 +6,15 @@ from config import HEADERS
 class AsyncLoader():
 
     def __init__(self):
-        self.urls:list
-        self.extention:str = 'bytestream'
+        self.__urls:list
+        self.__extention:str = 'bytestream'
 
-    def set_urls(self, urls):
-        self.urls = urls
-
-    def set_ext(self, extention: str):
-        self.extention = extention
+    def set_params(self, urls:list, extention:str):
+        self.__urls = urls
+        self.__extention = extention
 
     async def __download_files(self, url: str, filename: str):
-        with open(filename.strip() + f'.{self.extention}', 'wb') as f:
+        with open(filename.strip() + f'.{self.__extention}', 'wb') as f:
             async with httpx.AsyncClient() as client:
                 async with client.stream('GET', url, headers=HEADERS) as r:
                     
@@ -42,7 +40,7 @@ class AsyncLoader():
 
         loop = asyncio.get_running_loop()
 
-        tasks = [loop.create_task(self.__download_files(url, filename)) for url, filename in self.urls]
+        tasks = [loop.create_task(self.__download_files(url, filename)) for url, filename in self.__urls]
 
         await asyncio.gather(*tasks, return_exceptions=True)
 
