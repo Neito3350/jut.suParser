@@ -3,6 +3,7 @@ import httpx
 import tqdm
 from config import HEADERS
 
+
 class AsyncLoader():
 
     def __init__(self):

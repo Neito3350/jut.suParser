@@ -1,10 +1,9 @@
 import requests
 import re
 from bs4 import BeautifulSoup
-from logger import Logger
-from config import HEADERS, WRITE_LOGS_TO_FILE
+from loguru import logger as log
+from config import HEADERS
 
-logger = Logger(write_to_logfile=WRITE_LOGS_TO_FILE)
 
 class Anime():
 
@@ -19,7 +18,7 @@ class Anime():
 			self._domian = ""
 
 		if not self._req.status_code == 200:
-			logger.setlog(f"запрос на {self._url}, статус код {self._req.status_code}")
+			log.debug(f"запрос на {self._url}, статус код {self._req.status_code}")
 			self._soup = None
 			return
 		self._soup = BeautifulSoup(self._req.text, "lxml")
@@ -27,7 +26,7 @@ class Anime():
 	def get_specs(self) -> dict:
 		# вернет жанр, год выпуска, темы, возрастной рейтинг, оригинальное название
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 		
 		result = {}
@@ -45,7 +44,7 @@ class Anime():
 	def get_slogan(self) -> str:
 		# возвращает слоган
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 		
 		return self._soup.find("div", class_="top_logo_slogan").get_text()
@@ -53,7 +52,7 @@ class Anime():
 	def get_first_episode(self) -> str:
 		# возвращает первый эпизод в аниме
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 		
 		return self.get_episodes()[0]
@@ -61,7 +60,7 @@ class Anime():
 	def get_last_episode(self) -> str:
 		# возвращает последний эпизод в аниме
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 		
 		return self.get_episodes()[-1]
@@ -69,7 +68,7 @@ class Anime():
 	def get_arches(self) -> list:
 		# возвращает арки
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 		
 		return [i.get_text() for i in self._soup.find_all("h2", class_="b-b-title the-anime-season center")]
@@ -77,7 +76,7 @@ class Anime():
 	def get_title(self) -> str:
 		# возвращает название аниме
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 		
 		return self._soup.find("h1", class_="header_video allanimevideo anime_padding_for_title").get_text().replace("Смотреть", "").replace("все серии", "").replace("и сезоны", "").strip()
@@ -85,7 +84,7 @@ class Anime():
 	def get_description(self) -> str:
 		# возвращает описание
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 
 		result = []
@@ -103,7 +102,7 @@ class Anime():
 	def get_episodes(self) -> list:
 		# возвращает эпизоды
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 		
 		episodes = []
@@ -115,7 +114,7 @@ class Anime():
 	def get_films(self) -> list:
 		# возвращает фильмы
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 		
 		films = []
@@ -127,11 +126,11 @@ class Anime():
 	def get_episodes_by_arches(self) -> dict:
 		# возвращает арку + принадлежащие ей эпизоды
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 
 		if not self._soup.find("h2", class_="b-b-title the-anime-season center"):
-			logger.setlog("Аниме не поделено на арки")
+			log.debug("Аниме не поделено на арки")
 			return self.get_episodes()
 
 		result = {}

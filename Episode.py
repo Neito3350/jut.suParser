@@ -1,9 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-from logger import Logger
-from config import HEADERS, WRITE_LOGS_TO_FILE
+from loguru import logger as log
+from config import HEADERS
 
-logger = Logger(write_to_logfile=WRITE_LOGS_TO_FILE)
 
 class Episode():
 
@@ -19,7 +18,7 @@ class Episode():
 			self._domian = "https://jut.su"
 
 		if not self._req.status_code == 200:
-			logger.setlog(f"запрос на {self._url}, статус код {self._req.status_code}")
+			log.debug(f"запрос на {self._url}, статус код {self._req.status_code}")
 			self._soup = None
 			return
 		self._soup = BeautifulSoup(self._req.text, "lxml")
@@ -47,12 +46,12 @@ class Episode():
 	def get_direct_link(self, resolution:str) -> str:
 		# возвращает прямую ссылку на эпизод
 		if not self._soup:
-			logger.setlog("объект супа не создан")
+			log.debug("объект супа не создан")
 			return
 
 		all_src = self._soup.find_all("source", attrs={"type":"video/mp4"})
 		if all_src == []:
-			logger.setlog("Это видео заблокировано в вашей стране")
+			log.debug("Это видео заблокировано в вашей стране")
 			return
 		
 		for i in all_src:
@@ -66,8 +65,8 @@ class Episode():
 	# 	if not direct_link == None:
 	# 		stream = requests.get(direct_link, headers=HEADERS, stream=True)
 	# 		contentLength = int(stream.headers.get("content-length", 0))
-	# 		logger.setlog(f"статус код потока: {stream}, размер контента (в байтах): {str(contentLength)}")
+	# 		log.debug(f"статус код потока: {stream}, размер контента (в байтах): {str(contentLength)}")
 	# 		return [stream, contentLength]
 	# 	else:
-	# 		logger.setlog("Поток недоступен")
+	# 		log.debug("Поток недоступен")
 	# 		return
