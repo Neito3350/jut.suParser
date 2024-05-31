@@ -37,7 +37,10 @@ class Anime():
 
 		for i in str(raw).split("<br/>"):
 			temp = re.sub("<.*?>|&.*?;|\\n|\\xa0", "", i).strip().split(":")
-			result[temp[0]] = temp[1].strip()
+
+			# log.info(temp)
+			if len(temp) > 1:
+				result[temp[0]] = temp[1].strip()
 
 		return result
 	
@@ -47,7 +50,13 @@ class Anime():
 			log.debug("объект супа не создан")
 			return
 		
-		return self._soup.find("div", class_="top_logo_slogan").get_text()
+		slogan = self._soup.find("div", class_="top_logo_slogan")
+
+		if not slogan:
+			log.info("У аниме нет слогана")
+			return None
+		
+		return slogan.get_text()
 
 	def get_first_episode(self) -> str:
 		# возвращает первый эпизод в аниме
@@ -70,6 +79,9 @@ class Anime():
 		if not self._soup:
 			log.debug("объект супа не создан")
 			return
+		
+		if not self._soup.find("h2", class_="b-b-title the-anime-season center"):
+			log.debug("Аниме не поделено на арки")
 		
 		return [i.get_text() for i in self._soup.find_all("h2", class_="b-b-title the-anime-season center")]
 	
@@ -121,6 +133,10 @@ class Anime():
 		for episode in self._soup.find_all("a", class_=["b-b-title the-anime-season center", "short-btn green video the_hildi", "short-btn black video the_hildi"]):
 			if "film-" in str(episode):
 				films.append(self._domian + episode["href"])
+		if not films:
+			log.info("У аниме нет фильмов")
+			return []
+
 		return films
 
 	def get_episodes_by_arches(self) -> dict:
@@ -131,7 +147,7 @@ class Anime():
 
 		if not self._soup.find("h2", class_="b-b-title the-anime-season center"):
 			log.debug("Аниме не поделено на арки")
-			return self.get_episodes()
+			return []
 
 		result = {}
 		archAndEpisodes = self._soup.find_all(["h2", "a"], class_=["b-b-title the-anime-season center", "short-btn green video the_hildi", "short-btn black video the_hildi"])
