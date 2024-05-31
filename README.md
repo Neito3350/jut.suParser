@@ -4,7 +4,6 @@
 ```python
 from Anime import Anime
 from Episode import Episode
-from async_loader import AsyncLoader
 
 # методы класса Anime
 anime = Anime("URL TO ANIME")
