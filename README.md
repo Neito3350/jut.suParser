@@ -1,7 +1,5 @@
 # jutsu Parser
 
-Асинхронный загрузчик создан на основе этого: https://github.com/pythontoday/download_files_with_progress_bar
-
 ## Пример:
 ```python
 from Anime import Anime
